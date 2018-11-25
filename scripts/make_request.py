@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import json
 from tensorflow.examples.tutorials.mnist import input_data

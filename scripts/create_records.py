@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 """Converts MNIST data to TFRecords file format with Example protos."""
 from __future__ import absolute_import
