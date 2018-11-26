@@ -1,15 +1,11 @@
 #!/bin/bash
 
-MAXWORKERS=20
+MAXWORKERS=$1
 WORKDIR=/tmp/workdir
 ZONE=--zone=europe-west1-b
 
-if [[ $# -lt 1 ]]; then
-  PROJECT_ID=$(gcloud config list project --format "value(core.project)")
-  BUCKET="gs://${PROJECT_ID}-ml"
-else
-  BUCKET=$1
-fi
+PROJECT_ID=$(gcloud config list project --format "value(core.project)")
+BUCKET="gs://${PROJECT_ID}-ml"
 
 JOBNAME=job_$(date -u +%y%m%d_%H%M%S)
 DATADIR=${BUCKET}/data
@@ -50,6 +46,9 @@ for i in $(seq 0 $NUM_WORKER); do
     worker_entry="${worker_entry}\"worker-${i}:2222\"],"
   fi
 done
+if [[ $NUM_WORKER -lt 0 ]]; then
+  worker_entry="\"worker\": [],"
+fi
 
 cat <<EOF > /tmp/tf_config.json
 {
@@ -66,7 +65,10 @@ cat <<EOF > /tmp/tf_config.json
 }
 EOF
 
+sudo apt install -y bc
+
 echo "Start a training job."
+START=$(date +%s.%N)
 
 # Start parameter servers in the background
 for  i in $(seq 0 $NUM_PS); do
@@ -101,6 +103,9 @@ gcloud compute ssh master-0 $ZONE -- $WORKDIR/start-dist-mnist.sh $DATADIR $OUTD
 
 # Cleanup
 echo "Done. Force stop remaining processes."
+END=$(date +%s.%N)
+DIFF=$(echo "$END - $START" | bc)
+printf "Elapsed time: %.3f seconds\n" $DIFF
 ./stop-training.sh
 
 ORIGIN=$(gsutil ls $BUCKET/$JOBNAME/export/Servo | tail -1)

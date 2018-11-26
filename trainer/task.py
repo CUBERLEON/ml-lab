@@ -100,4 +100,7 @@ if __name__ == '__main__':
   output_dir = arguments.pop('output_dir')
 
   # Run the training job
-  learn_runner.run(generate_experiment_fn(**arguments), output_dir)
+  try:
+    learn_runner.run(generate_experiment_fn(**arguments), output_dir)
+  except TypeError:
+    print("Terminating...")

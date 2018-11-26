@@ -20,4 +20,5 @@ INDEX=$(hostname | awk -F'-' '{ print $2 }')
 export TF_CONFIG=$(sed "s/__INDEX__/$INDEX/;s/__ROLE__/$ROLE/" tf_config.json)
 export PYTHONPATH="$PWD":"${PYTHONPATH}"
 
-python3 trainer/task.py --output_dir=$OUTDIR --data_dir=$DATADIR --train_steps=10000
+python3 trainer/task.py --output_dir=$OUTDIR --data_dir=$DATADIR --train_steps=1000
+    
